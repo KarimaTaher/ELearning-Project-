@@ -1,0 +1,7 @@
+name: 'Users Registration'
+type: module
+description: 'Module to customize the users registration form.'
+core_version_requirement: ^10
+package: Elearning
+dependencies:
+  - drupal:user

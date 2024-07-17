@@ -1,0 +1,77 @@
+<?php
+
+    /**
+     * @file
+     * This file demonstrates how to use hooks to alter forms.
+     */
+    
+    use Drupal\Core\Form\FormStateInterface;
+    
+    /**
+     * Implements hook_form_alter().
+     */
+    function elearning_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+        // Check if the form ID is 'user_register_form'.
+        if ($form_id == 'user_register_form') {
+            // Add a 'profile' select field to the registration form.
+            $form['profile'] = [
+                '#type' => 'select',
+                '#title' => \Drupal::translation()->translate('Profile'),
+                '#required' => TRUE,
+                '#options' => [
+                    'Student' => \Drupal::translation()->translate('Etudiant'),
+                    'Trainer' => \Drupal::translation()->translate('Formateur'),
+                ],
+                '#ajax' => [
+                    'callback' => 'elearning_form_profile_callback',
+                    'wrapper' => 'profile-dependent-fields',
+                    'effect' => 'fade',
+                ],
+            ];
+    
+            // Create a container for the fields that depend on the profile selection.
+            $form['profile_dependent_fields'] = [
+                '#type' => 'container',
+                '#attributes' => ['id' => 'profile-dependent-fields'],
+            ];
+
+            // Add a 'speciality' select field.
+            $form['profile_dependent_fields']['speciality'] = [
+                '#type' => 'select',
+                '#title' => \Drupal::translation()->translate('Speciality'),
+                '#description' => \Drupal::translation()->translate(''),
+                '#required' => TRUE,
+                '#options' => [
+                    'AI' => \Drupal::translation()->translate('Artificial Intelligence'),
+                    'PD' => \Drupal::translation()->translate('Programming & Development'),
+                    'CC' => \Drupal::translation()->translate('Cloud Computing'),
+                    'DS' => \Drupal::translation()->translate('Data Science'),
+                ],
+            ];
+    
+            // Add an 'Année_experience' number field.
+            $form['profile_dependent_fields']['Année_experience'] = [
+                '#type' => 'number',
+                '#title' => \Drupal::translation()->translate('Année experience'),
+                '#description' => \Drupal::translation()->translate(''),
+                '#required' => FALSE,
+            ];
+
+            // Use AJAX to handle the profile selection and show/hide fields accordingly.
+               if ($form_state->getValue('profile') == 'Student') {
+                unset($form['profile_dependent_fields']['speciality']);
+                unset($form['profile_dependent_fields']['Année_experience']);
+            }
+
+    
+       
+        }
+    }
+    
+    /**
+     * AJAX callback for the profile select field.
+     */
+    function elearning_form_profile_callback(array &$form, FormStateInterface $form_state) {
+        return $form['profile_dependent_fields'];
+    }
+    
